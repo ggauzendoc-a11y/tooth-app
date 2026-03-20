@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Зубы">
+<title>Зубы</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #1f2937;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --green: #3fb950;
+  --green2: #56d364;
+  --yellow: #d29922;
+  --orange: #f97316;
+  --red: #f85149;
+  --blue2: #a5d6ff;
+  --gum: #8b2a3d;
+  --sheet-h: 200px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 8px;
+  padding-top: max(12px, env(safe-area-inset-top));
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #e6edf3, #58a6ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.phase-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  max-width: 160px;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* ── AGE PANEL ── */
+.age-panel {
+  padding: 0 16px 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.age-display {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+  min-width: 90px;
+  line-height: 1;
+}
+
+.age-display small {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.slider-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.age-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.age-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── JAW AREA ── */
+.jaw-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  gap: 0;
+  overflow: hidden;
+}
+
+.jaw-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 6px;
+}
+
+.jaw-row {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.jaw-row.lower { align-items: flex-start; }
+
+.midline {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.midline-line {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gum), var(--gum), transparent);
+}
+
+.midline-label {
+  font-size: 9px;
+  color: #c2455a;
+  font-family: 'Space Mono', monospace;
+  white-space: nowrap;
+}
+
+/* ── TOOTH ── */
+.tooth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.12s;
+  position: relative;
+}
+
+.tooth.lower { flex-direction: column-reverse; }
+.tooth:active { transform: scale(1.15); z-index: 20; }
+.tooth.selected { transform: scale(1.15); z-index: 20; }
+
+.tooth-body {
+  border-radius: 7px 7px 3px 3px;
+  border: 2px solid rgba(0,0,0,0.25);
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.tooth-body::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 38%;
+  background: rgba(255,255,255,0.18);
+  border-radius: 5px 5px 0 0;
+}
+
+.tooth.lower .tooth-body {
+  border-radius: 3px 3px 7px 7px;
+}
+.tooth.lower .tooth-body::after {
+  top: auto; bottom: 0;
+  border-radius: 0 0 5px 5px;
+}
+
+.tooth-root {
+  width: 55%;
+  height: 8px;
+  border-radius: 0 0 4px 4px;
+  opacity: 0.55;
+  transition: background 0.3s;
+}
+
+.tooth.lower .tooth-root {
+  border-radius: 4px 4px 0 0;
+}
+
+.tooth-num {
+  font-size: 8px;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  margin-top: 2px;
+}
+
+.tooth.lower .tooth-num { margin-top: 0; margin-bottom: 2px; order: 10; }
+
+/* Status colors */
+.s-missing .tooth-body  { background: #21262d; border-color: #2d333b; }
+.s-missing .tooth-root  { background: #21262d; }
+.s-missing .tooth-num   { color: #3a3f47; }
+
+.s-baby .tooth-body     { background: var(--green2); }
+.s-baby .tooth-root     { background: #2ea043; }
+
+.s-erupting .tooth-body { background: var(--green); animation: pg 1.4s ease-in-out infinite; }
+.s-erupting .tooth-root { background: #2ea043; }
+
+.s-soon-fall .tooth-body { background: var(--yellow); }
+.s-soon-fall .tooth-root { background: #9e6a03; }
+
+.s-falling .tooth-body  { background: var(--orange); animation: wobble 2s ease-in-out infinite; }
+.s-falling .tooth-root  { background: #c2410c; }
+
+.s-fallen .tooth-body   { background: var(--red); opacity: 0.45; }
+.s-fallen .tooth-root   { background: #b91c1c; opacity: 0.3; }
+
+.s-perm-new .tooth-body { background: var(--accent); animation: pb 1.8s ease-in-out infinite; }
+.s-perm-new .tooth-root { background: #1d6fb8; }
+
+.s-permanent .tooth-body { background: var(--blue2); }
+.s-permanent .tooth-root { background: #58a6ff; }
+
+@keyframes pg {
+  0%,100% { box-shadow: 0 0 0 0 rgba(63,185,80,0.6); }
+  50%      { box-shadow: 0 0 0 7px rgba(63,185,80,0); }
+}
+@keyframes pb {
+  0%,100% { box-shadow: 0 0 0 0 rgba(88,166,255,0.6); }
+  50%      { box-shadow: 0 0 0 7px rgba(88,166,255,0); }
+}
+@keyframes wobble {
+  0%,100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-4deg); }
+  75%      { transform: rotate(4deg); }
+}
+.tooth.selected.s-falling { animation: none; }
+
+/* ── BOTTOM SHEET ── */
+.sheet-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.sheet-bg.open { opacity: 1; pointer-events: all; }
+
+.sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #1c2128;
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  padding: 12px 20px 32px;
+  padding-bottom: max(32px, env(safe-area-inset-bottom));
+  z-index: 51;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.sheet-name {
+  font-size: 20px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.sheet-type {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sheet-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.sheet-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.sheet-key { color: var(--muted); }
+.sheet-val { font-weight: 700; }
+
+.sheet-status {
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ── LEGEND TOGGLE ── */
+.legend-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 16px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  width: 44px; height: 44px;
+  border-radius: 22px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 40;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.legend-panel {
+  position: fixed;
+  bottom: 74px;
+  right: 16px;
+  bottom: max(74px, calc(env(safe-area-inset-bottom) + 54px));
+  background: #1c2128;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 16px;
+  z-index: 40;
+  display: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  min-width: 210px;
+}
+.legend-panel.open { display: block; }
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+.legend-item:last-child { margin-bottom: 0; }
+
+.ldot {
+  width: 12px; height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ── LAYOUT ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: -webkit-fill-available;
+}
+
+.spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">🦷 Прорезывание зубов</div>
+    <div class="phase-pill" id="phasePill"></div>
+  </div>
+
+  <!-- Age -->
+  <div class="age-panel">
+    <div class="age-display" id="ageDisplay"></div>
+    <div class="slider-col">
+      <input type="range" class="age-slider" id="ageSlider" min="0" max="216" value="0">
+      <div class="slider-ticks">
+        <span>0</span><span>1г</span><span>3г</span><span>5г</span><span>7г</span><span>9г</span><span>12г</span><span>18г</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Jaw -->
+  <div class="jaw-area">
+    <div class="jaw-label">Верхняя челюсть</div>
+    <div id="upperJaw"></div>
+
+    <div class="midline">
+      <div class="midline-line"></div>
+      <div class="midline-label">смыкание</div>
+      <div class="midline-line"></div>
+    </div>
+
+    <div class="jaw-label" style="margin-top:4px">Нижняя челюсть</div>
+    <div id="lowerJaw"></div>
+  </div>
+
+  <!-- Info cards -->
+  <div id="infoRow" style="padding:8px 12px 12px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:max(12px,env(safe-area-inset-bottom))"></div>
+</div>
+
+<!-- Bottom sheet bg -->
+<div class="sheet-bg" id="sheetBg" onclick="closeSheet()"></div>
+
+<!-- Bottom sheet -->
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-name" id="shName"></div>
+  <div class="sheet-type" id="shType"></div>
+  <div class="sheet-rows" id="shRows"></div>
+  <div class="sheet-status" id="shStatus"></div>
+</div>
+
+<!-- Legend -->
+<div class="legend-btn" id="legendBtn" onclick="toggleLegend()">?</div>
+<div class="legend-panel" id="legendPanel">
+  <div class="legend-item"><div class="ldot" style="background:#21262d;border:1px solid #30363d"></div>Не прорезался</div>
+  <div class="legend-item"><div class="ldot" style="background:#3fb950;box-shadow:0 0 5px #3fb950"></div>Прорезается</div>
+  <div class="legend-item"><div class="ldot" style="background:#56d364"></div>Молочный</div>
+  <div class="legend-item"><div class="ldot" style="background:#d29922"></div>Скоро выпадет</div>
+  <div class="legend-item"><div class="ldot" style="background:#f97316"></div>Шатается / выпадает</div>
+  <div class="legend-item"><div class="ldot" style="background:#f85149;opacity:0.5"></div>Выпал (ждём пост.)</div>
+  <div class="legend-item"><div class="ldot" style="background:#58a6ff;box-shadow:0 0 5px #58a6ff"></div>Прорезается пост.</div>
+  <div class="legend-item"><div class="ldot" style="background:#a5d6ff"></div>Постоянный</div>
+</div>
+
+<script>
+const TEETH_UPPER = [
+  { id:'u8', name:'Зуб мудрости', type:'wisdom',   baby:false, permMin:192, permMax:276 },
+  { id:'u7', name:'Второй моляр', type:'molar',    baby:false, permMin:132, permMax:156 },
+  { id:'u6', name:'Первый моляр', type:'molar',    baby:false, permMin:72,  permMax:90  },
+  { id:'u5', name:'Второй премоляр', type:'premolar', baby:true, eruptMin:24, eruptMax:36, shedMin:96, shedMax:132, permMin:120, permMax:156 },
+  { id:'u4', name:'Первый премоляр', type:'premolar', baby:true, eruptMin:14, eruptMax:24, shedMin:96, shedMax:120, permMin:108, permMax:132 },
+  { id:'u3', name:'Клык',           type:'canine',   baby:true, eruptMin:16, eruptMax:22, shedMin:120, shedMax:144, permMin:126, permMax:156 },
+  { id:'u2', name:'Боковой резец',  type:'incisor',  baby:true, eruptMin:8,  eruptMax:12, shedMin:84,  shedMax:108, permMin:96,  permMax:120 },
+  { id:'u1', name:'Центральный резец', type:'incisor', baby:true, eruptMin:6, eruptMax:10, shedMin:72, shedMax:96,  permMin:84,  permMax:96  },
+];
+
+const TEETH_LOWER = [
+  { id:'l8', name:'Зуб мудрости',   type:'wisdom',   baby:false, permMin:192, permMax:276 },
+  { id:'l7', name:'Второй моляр',   type:'molar',    baby:false, permMin:120, permMax:144 },
+  { id:'l6', name:'Первый моляр',   type:'molar',    baby:false, permMin:72,  permMax:84  },
+  { id:'l5', name:'Второй премоляр',type:'premolar', baby:true, eruptMin:24, eruptMax:36, shedMin:96, shedMax:132, permMin:108, permMax:144 },
+  { id:'l4', name:'Первый премоляр',type:'premolar', baby:true, eruptMin:14, eruptMax:24, shedMin:96, shedMax:120, permMin:108, permMax:132 },
+  { id:'l3', name:'Клык',           type:'canine',   baby:true, eruptMin:16, eruptMax:22, shedMin:108, shedMax:132, permMin:108, permMax:132 },
+  { id:'l2', name:'Боковой резец',  type:'incisor',  baby:true, eruptMin:10, eruptMax:14, shedMin:84,  shedMax:108, permMin:96,  permMax:120 },
+  { id:'l1', name:'Центральный резец',type:'incisor',baby:true, eruptMin:6,  eruptMax:9,  shedMin:72,  shedMax:84,  permMin:72,  permMax:84  },
+];
+
+// Responsive tooth sizes
+function getSize(type) {
+  const w = window.innerWidth;
+  const scale = w < 380 ? 0.78 : w < 420 ? 0.88 : 1;
+  const base = { incisor:[28,38], canine:[26,44], premolar:[30,40], molar:[37,36], wisdom:[37,34] };
+  const [bw, bh] = base[type] || [28,38];
+  return { w: Math.round(bw*scale), h: Math.round(bh*scale) };
+}
+
+function getStatus(tooth, age) {
+  if (!tooth.baby) {
+    if (age < tooth.permMin - 6) return 'missing';
+    if (age < tooth.permMin + 6) return 'perm-new';
+    return 'permanent';
+  }
+  if (age < tooth.eruptMin - 2)  return 'missing';
+  if (age < tooth.eruptMin + 3)  return 'erupting';
+  if (age < tooth.shedMin - 12)  return 'baby';
+  if (age < tooth.shedMin - 4)   return 'soon-fall';
+  if (age < tooth.shedMin + 6)   return 'falling';
+  if (age < tooth.permMin + 8)   return 'fallen';
+  return 'permanent';
+}
+
+const STATUS_LABEL = {
+  missing:   'Ещё не прорезался',
+  erupting:  '🟢 Прорезается сейчас!',
+  baby:      'Молочный зуб',
+  'soon-fall':'🟡 Скоро начнёт шататься',
+  falling:   '🟠 Шатается / выпадает',
+  fallen:    '🔴 Выпал — ждём постоянный',
+  'perm-new':'🔵 Прорезается постоянный',
+  permanent: 'Постоянный зуб',
+};
+
+const STATUS_COLOR = {
+  missing:'#555', erupting:'#3fb950', baby:'#56d364',
+  'soon-fall':'#d29922', falling:'#f97316', fallen:'#f85149',
+  'perm-new':'#58a6ff', permanent:'#a5d6ff',
+};
+
+function fmt(min, max) {
+  const f = m => m < 12 ? m+'мес' : (m%12 ? Math.floor(m/12)+'г '+m%12+'мес' : Math.floor(m/12)+'г');
+  return f(min) + ' – ' + f(max);
+}
+
+let currentAge = 0;
+let selectedTooth = null;
+
+function buildTooth(tooth, isLower) {
+  const status = getStatus(tooth, currentAge);
+  const sz = getSize(tooth.type);
+
+  const wrap = document.createElement('div');
+  wrap.className = `tooth ${isLower?'lower':''} s-${status}`;
+  wrap.dataset.id = tooth.id;
+
+  const body = document.createElement('div');
+  body.className = 'tooth-body';
+  body.style.cssText = `width:${sz.w}px;height:${sz.h}px;`;
+
+  const root = document.createElement('div');
+  root.className = 'tooth-root';
+
+  const num = document.createElement('div');
+  num.className = 'tooth-num';
+  num.textContent = tooth.id.replace(/[ul]/,'');
+
+  if (isLower) {
+    wrap.appendChild(num);
+    wrap.appendChild(root);
+    wrap.appendChild(body);
+  } else {
+    wrap.appendChild(body);
+    wrap.appendChild(root);
+    wrap.appendChild(num);
+  }
+
+  wrap.addEventListener('click', () => openSheet(tooth, status));
+  return wrap;
+}
+
+function buildJaw(containerId, teeth, isLower) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  const row = document.createElement('div');
+  row.className = `jaw-row${isLower?' lower':''}`;
+
+  const sep = document.createElement('div');
+  sep.style.cssText = 'width:5px;flex-shrink:0;background:linear-gradient(to bottom,#c2455a88,#8b2a3d88);border-radius:2px;margin:0 2px;align-self:stretch;';
+
+  teeth.forEach(t => row.appendChild(buildTooth(t, isLower)));
+  // Insert separator in middle
+  const center = row.children[7];
+  if (center) row.insertBefore(sep, center);
+
+  c.appendChild(row);
+}
+
+function openSheet(tooth, status) {
+  const typeMap = {incisor:'Резец',canine:'Клык',premolar:'Премоляр',molar:'Моляр',wisdom:'Зуб мудрости'};
+  const jaw = tooth.id[0]==='u' ? 'Верхняя челюсть' : 'Нижняя челюсть';
+
+  document.getElementById('shName').textContent = tooth.name;
+  document.getElementById('shType').textContent = typeMap[tooth.type] + ' · ' + jaw;
+
+  let rows = '';
+  if (tooth.baby) {
+    rows += `<div class="sheet-row"><span class="sheet-key">Прорезывание молочного</span><span class="sheet-val">${fmt(tooth.eruptMin, tooth.eruptMax)}</span></div>`;
+    rows += `<div class="sheet-row"><span class="sheet-key">Выпадение</span><span class="sheet-val">${fmt(tooth.shedMin, tooth.shedMax)}</span></div>`;
+    rows += `<div class="sheet-row"><span class="sheet-key">Постоянный</span><span class="sheet-val">${fmt(tooth.permMin, tooth.permMax)}</span></div>`;
+  } else {
+    rows += `<div class="sheet-row"><span class="sheet-key">Прорезывание</span><span class="sheet-val">${fmt(tooth.permMin, tooth.permMax)}</span></div>`;
+  }
+  document.getElementById('shRows').innerHTML = rows;
+
+  const col = STATUS_COLOR[status];
+  const st = document.getElementById('shStatus');
+  st.textContent = STATUS_LABEL[status];
+  st.style.cssText = `background:${col}22;color:${col};border:1px solid ${col}44;padding:8px 14px;border-radius:12px;font-size:14px;font-weight:800;text-align:center;`;
+
+  document.getElementById('sheet').classList.add('open');
+  document.getElementById('sheetBg').classList.add('open');
+}
+
+function closeSheet() {
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('sheetBg').classList.remove('open');
+}
+
+function toggleLegend() {
+  document.getElementById('legendPanel').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  const lp = document.getElementById('legendPanel');
+  const lb = document.getElementById('legendBtn');
+  if (!lp.contains(e.target) && !lb.contains(e.target)) {
+    lp.classList.remove('open');
+  }
+});
+
+function getAgeText(m) {
+  if (m < 12) return `${m} <small>мес.</small>`;
+  const y = Math.floor(m/12), mo = m%12;
+  return mo ? `${y}г <small>${mo}м</small>` : `${y} <small>лет</small>`;
+}
+
+function getPhase(m) {
+  if (m < 6)   return { label:'Зубы не появились', color:'#58a6ff', bg:'#1d4ed833' };
+  if (m < 36)  return { label:'Молочные прорезываются', color:'#3fb950', bg:'#16653433' };
+  if (m < 66)  return { label:'Молочный прикус', color:'#56d364', bg:'#14532d33' };
+  if (m < 84)  return { label:'Начало смены зубов', color:'#d29922', bg:'#713f1233' };
+  if (m < 144) return { label:'Смешанный прикус', color:'#f97316', bg:'#7c2d1233' };
+  if (m < 180) return { label:'Постоянный прикус формируется', color:'#58a6ff', bg:'#1e3a5f33' };
+  return { label:'Постоянный прикус', color:'#a5d6ff', bg:'#1a2f4a33' };
+}
+
+function updateInfoRow(m) {
+  const all = [...TEETH_UPPER, ...TEETH_LOWER];
+  const erupting = all.filter(t => getStatus(t,m)==='erupting');
+  const falling  = all.filter(t => ['falling','soon-fall'].includes(getStatus(t,m)));
+  const permNew  = all.filter(t => getStatus(t,m)==='perm-new');
+  const babyCount = all.filter(t => ['baby','erupting','soon-fall','falling'].includes(getStatus(t,m))).length;
+  const permCount = all.filter(t => ['permanent','perm-new'].includes(getStatus(t,m))).length;
+  const gaps      = all.filter(t => getStatus(t,m)==='fallen').length;
+
+  const card = (emoji, label, color, bg, items) => `
+    <div style="background:${bg};border:1px solid ${color}33;border-radius:14px;padding:10px 12px;min-width:140px;flex-shrink:0;">
+      <div style="font-size:11px;color:${color};font-weight:800;margin-bottom:6px;white-space:nowrap;">${emoji} ${label}</div>
+      <div style="font-size:12px;line-height:1.5;">${items}</div>
+    </div>`;
+
+  let html = '';
+
+  if (erupting.length)
+    html += card('🟢','Прорезываются','#3fb950','#16653422', erupting.map(t=>`<div>${t.name}</div>`).join(''));
+  if (falling.length)
+    html += card('🟠','Выпадают','#f97316','#7c2d1222', falling.map(t=>`<div>${t.name}</div>`).join(''));
+  if (permNew.length)
+    html += card('🔵','Постоянные','#58a6ff','#1e3a5f22', permNew.map(t=>`<div>${t.name}</div>`).join(''));
+
+  html += card('📊','Состав','#8b949e','#1f293733',
+    `<div>🟢 Молочных: <b>${babyCount}</b></div><div>🔵 Постоянных: <b>${permCount}</b></div>${gaps?`<div>🔴 Промежутков: <b>${gaps}</b></div>`:''}`);
+
+  document.getElementById('infoRow').innerHTML = html;
+}
+
+function update() {
+  currentAge = parseInt(document.getElementById('ageSlider').value);
+
+  document.getElementById('ageDisplay').innerHTML = getAgeText(currentAge);
+
+  const phase = getPhase(currentAge);
+  const pill = document.getElementById('phasePill');
+  pill.textContent = phase.label;
+  pill.style.cssText = `background:${phase.bg};color:${phase.color};font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;max-width:160px;text-align:center;line-height:1.3;border:1px solid ${phase.color}33;`;
+
+  buildJaw('upperJaw', TEETH_UPPER, false);
+  buildJaw('lowerJaw', TEETH_LOWER, true);
+  updateInfoRow(currentAge);
+}
+
+const slider = document.getElementById('ageSlider');
+slider.addEventListener('input', function() {
+  const pct = (this.value / this.max) * 100;
+  this.style.background = `linear-gradient(to right,#58a6ff ${pct}%,#1f2937 ${pct}%)`;
+  update();
+});
+slider.style.background = `linear-gradient(to right,#58a6ff 0%,#1f2937 0%)`;
+
+update();
+</script>
+</body>
+</html>
